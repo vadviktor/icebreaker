@@ -18,3 +18,7 @@ move-item -force ./icebreaker.exe ~/.local/bin/
 $env:AWS_PROFILE="xxx"
 icebreaker -path s3://mybucket/myfolder
 ```
+
+```shell
+AWS_PROFILE="xxx" icebreaker -path s3://mybucket/myfolder
+```
