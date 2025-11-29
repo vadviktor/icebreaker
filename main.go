@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"os"
 	"path/filepath"
@@ -9,10 +8,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"icebreaker/s3restore"
+
 	charm_log "github.com/charmbracelet/log"
 )
 
@@ -108,106 +105,14 @@ func main() {
 		prefix = pathParts[1]
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		logger.Fatalf("Unable to load SDK config, %v", err)
-	}
-
-	s3Client := s3.NewFromConfig(cfg)
-
-	paginator := s3.NewListObjectsV2Paginator(s3Client, &s3.ListObjectsV2Input{
-		Bucket: aws.String(bucket),
-		Prefix: aws.String(prefix),
-		OptionalObjectAttributes: []types.OptionalObjectAttributes{
-			types.OptionalObjectAttributesRestoreStatus,
-		},
+	err := s3restore.RestoreObjects(s3restore.RestoreConfig{
+		Bucket: bucket,
+		Prefix: prefix,
+		Days:   appCfg.days,
+		DryRun: appCfg.dryRun,
+		Logger: logger,
 	})
-
-	logger.Infof("Processing objects in s3://%s/%s", bucket, prefix)
-
-	for paginator.HasMorePages() {
-		page, err := paginator.NextPage(context.TODO())
-		if err != nil {
-			logger.Fatalf("Failed to get page, %v", err)
-		}
-
-		for _, obj := range page.Contents {
-			processObject(obj, s3Client, bucket, appCfg.days, appCfg.dryRun)
-		}
+	if err != nil {
+		logger.Fatalf("Failed to restore objects: %v", err)
 	}
-
-	logger.Info("Processing complete.")
-}
-
-func processObject(obj types.Object, s3Client *s3.Client, bucket string, days int, dryRun bool) {
-	if obj.Key == nil {
-		return
-	}
-
-	objectKey := *obj.Key
-
-	if obj.StorageClass != types.ObjectStorageClass(types.StorageClassDeepArchive) {
-		return
-	}
-
-	if dryRun {
-		logger.Infof("🔍 Would restore: %s", objectKey)
-
-		return
-	}
-
-	restoreStatus := obj.RestoreStatus
-
-	if objectNotBeingRestored(restoreStatus) {
-		logger.Infof("🚀 Requesting restoration: %s", objectKey)
-
-		_, err := s3Client.RestoreObject(context.TODO(), &s3.RestoreObjectInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(objectKey),
-			RestoreRequest: &types.RestoreRequest{
-				Days: aws.Int32(int32(days)),
-				GlacierJobParameters: &types.GlacierJobParameters{
-					Tier: types.TierBulk,
-				},
-			},
-		})
-		if err != nil {
-			logger.Warnf("Failed to restore %s: %v", objectKey, err)
-		}
-	} else if objectIsRestored(restoreStatus) {
-		expiryDate := "N/A"
-		if restoreStatus.RestoreExpiryDate != nil {
-			expiryDate = restoreStatus.RestoreExpiryDate.Format(time.RFC3339)
-		}
-
-		logger.Infof("✅ Restored: %s, ⌛ until: %s", objectKey, expiryDate)
-	} else if restoreStatus != nil && restoreStatus.IsRestoreInProgress != nil && *restoreStatus.IsRestoreInProgress {
-		logger.Infof("🏗️ Restoring: %s", objectKey)
-	}
-}
-
-func objectNotBeingRestored(status *types.RestoreStatus) bool {
-	if status == nil {
-		return true // No status means not restored and not in progress
-	}
-
-	isRestoreInProgress := false
-	if status.IsRestoreInProgress != nil {
-		isRestoreInProgress = *status.IsRestoreInProgress
-	}
-
-	return !isRestoreInProgress && status.RestoreExpiryDate == nil
-}
-
-func objectIsRestored(status *types.RestoreStatus) bool {
-	if status == nil {
-		return false
-	}
-
-	isRestoreInProgress := false
-	if status.IsRestoreInProgress != nil {
-		isRestoreInProgress = *status.IsRestoreInProgress
-	}
-
-	return !isRestoreInProgress && status.RestoreExpiryDate != nil
 }
