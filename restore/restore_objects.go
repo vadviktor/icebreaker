@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/charmbracelet/log"
+	"github.com/vadviktor/icebreaker/db"
 )
 
 // RestoreConfig holds the configuration for restoring S3 objects from Glacier Deep Archive
@@ -18,6 +19,7 @@ type RestoreConfig struct {
 	Days   int
 	DryRun bool
 	Logger *log.Logger
+	DB     db.KeyDB
 }
 
 // RestoreObjects iterates through objects at the specified S3 path, identifies objects in

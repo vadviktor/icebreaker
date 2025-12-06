@@ -4,6 +4,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/vadviktor/icebreaker/db"
 	"github.com/vadviktor/icebreaker/helpers"
 	"github.com/vadviktor/icebreaker/restore"
 	"github.com/vadviktor/icebreaker/types"
@@ -46,12 +47,16 @@ var restoreCmd = &cobra.Command{
 			}
 		}
 
+		db := db.NewDB()
+		db.Migrate()
+		defer db.Close()
 		err = restore.RestoreObjects(&restore.RestoreConfig{
 			Bucket: s3Parts.Bucket,
 			Prefix: s3Parts.Prefix,
 			Days:   days,
 			DryRun: dryRun,
 			Logger: logger,
+			DB:     db,
 		})
 		if err != nil {
 			logger.Error("Failed to restore objects: %v", err)
