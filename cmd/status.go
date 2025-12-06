@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/vadviktor/icebreaker/helpers"
 )
 
 // statusCmd represents the status command
@@ -11,7 +12,7 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Reports the status of objects in S3 Glacier Deep Archive",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := validateFlags(cmd); err != nil {
+		if err := helpers.ValidateFlags(cmd); err != nil {
 			cmd.Help()
 			os.Exit(0)
 		}

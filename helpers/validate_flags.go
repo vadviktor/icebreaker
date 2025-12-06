@@ -1,4 +1,4 @@
-package cmd
+package helpers
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func validateFlags(cmd *cobra.Command) error {
+func ValidateFlags(cmd *cobra.Command) error {
 	uri, err := cmd.Flags().GetString("uri")
 	if err != nil {
 		return err

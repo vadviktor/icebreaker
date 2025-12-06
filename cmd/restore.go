@@ -1,21 +1,16 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/vadviktor/icebreaker/helpers"
 	"github.com/vadviktor/icebreaker/restore"
+	"github.com/vadviktor/icebreaker/types"
 
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
-
-type S3Parts struct {
-	Bucket string
-	Prefix string
-}
 
 var logger = log.NewWithOptions(os.Stdout, log.Options{
 	TimeFormat:      time.DateTime,
@@ -27,7 +22,7 @@ var restoreCmd = &cobra.Command{
 	Use:   "restore",
 	Short: "Initiates restoration of objects in S3 Glacier Deep Archive",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := validateFlags(cmd); err != nil {
+		if err := helpers.ValidateFlags(cmd); err != nil {
 			cmd.Help()
 			os.Exit(0)
 		}
@@ -42,10 +37,10 @@ var restoreCmd = &cobra.Command{
 			dryRun = false
 		}
 
-		var s3Parts S3Parts
-		s3Parts, err = s3PartsFromUri(cmd.Flag("uri").Value.String())
+		var s3Parts types.S3Parts
+		s3Parts, err = helpers.S3PartsFromUri(cmd.Flag("uri").Value.String())
 		if err != nil {
-			s3Parts = S3Parts{
+			s3Parts = types.S3Parts{
 				Bucket: cmd.Flag("bucket").Value.String(),
 				Prefix: cmd.Flag("path").Value.String(),
 			}
@@ -87,23 +82,4 @@ func init() {
 
 	restoreCmd.Flags().IntP("days", "d", 1, "The number of days to restore the objects for.")
 	restoreCmd.Flags().BoolP("dry-run", "n", false, "List affected objects without restoring.")
-}
-
-func s3PartsFromUri(uri string) (S3Parts, error) {
-	if uri == "" || !strings.HasPrefix(uri, "s3://") {
-		return S3Parts{}, fmt.Errorf("invalid URI: %s", uri)
-	}
-
-	pathParts := strings.SplitN(strings.TrimPrefix(uri, "s3://"), "/", 2)
-	bucket := pathParts[0]
-
-	prefix := ""
-	if len(pathParts) > 1 {
-		prefix = pathParts[1]
-	}
-
-	return S3Parts{
-		Bucket: bucket,
-		Prefix: prefix,
-	}, nil
 }
