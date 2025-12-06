@@ -1,0 +1,26 @@
+---
+description: Used libraries and customizations
+alwaysApply: false
+---
+- Use https://github.com/charmbracelet/lipgloss to present user friendly and pleasent output in the terminal.
+- Use https://github.com/charmbracelet/log to present user friendly and informative log output in the terminal.
+
+- Use only my preferred TrueColor palette:
+ - TrueColor: #fb2c36, ANSI256: 196, ANSI: 9  -> Critical errors, fatal exceptions, system failures, security alerts, destructive actions
+ - TrueColor: #ff2056, ANSI256: 198, ANSI: 9  -> Error messages, validation failures, permission denied, file not found, connection refused
+ - TrueColor: #f54900, ANSI256: 202, ANSI: 9  -> High priority warnings, deprecated features, resource exhaustion, timeout warnings, breaking changes
+ - TrueColor: #fe9a00, ANSI256: 214, ANSI: 11 -> General warnings, non-critical issues, retry attempts, fallback actions, configuration issues
+ - TrueColor: #f0b100, ANSI256: 214, ANSI: 11 -> Caution messages, pending operations, queue status, rate limiting, temporary states
+ - TrueColor: #7ccf00, ANSI256: 112, ANSI: 10 -> Successful operations, tests passed, builds completed, data synchronized, operations confirmed
+ - TrueColor: #00c950, ANSI256: 42,  ANSI: 10 -> Progress indicators, active processes, health checks passed, services running, positive metrics
+ - TrueColor: #00bc7d, ANSI256: 42,  ANSI: 10 -> Incremental progress, file operations, database transactions, API responses, feature enabled
+ - TrueColor: #00bba7, ANSI256: 43,  ANSI: 14 -> Network operations, remote connections, API calls, database queries, external integrations
+ - TrueColor: #00b8db, ANSI256: 44,  ANSI: 14 -> System information, resource usage, memory stats, disk operations, cache operations
+ - TrueColor: #00a6f4, ANSI256: 39,  ANSI: 12 -> General information, help messages, documentation links, version info, environment details
+ - TrueColor: #2b7fff, ANSI256: 69,  ANSI: 12 -> Debug information, verbose logging, development mode, trace messages, detailed output
+ - TrueColor: #615fff, ANSI256: 105, ANSI: 12 -> Authentication, security operations, encryption, user sessions, admin functions
+ - TrueColor: #8e51ff, ANSI256: 141, ANSI: 13 -> Background tasks, scheduled jobs, automation, workflows, batch operations
+ - TrueColor: #ad46ff, ANSI256: 129, ANSI: 13 -> Special features, experimental functionality, plugin operations, custom extensions, advanced options
+ - TrueColor: #e12afb, ANSI256: 171, ANSI: 13 -> Important highlights, key metrics, performance indicators, notable achievements, milestones
+ - TrueColor: #f6339a, ANSI256: 199, ANSI: 13 -> User attention, interactive prompts, input requests, selection indicators, active choices
+ - TrueColor: #737373, ANSI256: 244, ANSI: 8  -> Secondary information, timestamps, metadata, comments, disabled states, placeholder text

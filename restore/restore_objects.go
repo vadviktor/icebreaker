@@ -1,4 +1,4 @@
-package s3restore
+package restore
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	charm_log "github.com/charmbracelet/log"
+	"github.com/charmbracelet/log"
 )
 
 // RestoreConfig holds the configuration for restoring S3 objects from Glacier Deep Archive
@@ -17,13 +17,13 @@ type RestoreConfig struct {
 	Prefix string
 	Days   int
 	DryRun bool
-	Logger *charm_log.Logger
+	Logger *log.Logger
 }
 
 // RestoreObjects iterates through objects at the specified S3 path, identifies objects in
 // Deep Archive, and initiates a restoration request for them if they are not
 // already restored or in the process of being restored.
-func RestoreObjects(cfg RestoreConfig) error {
+func RestoreObjects(cfg *RestoreConfig) error {
 	awsCfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ func RestoreObjects(cfg RestoreConfig) error {
 	return nil
 }
 
-func processObject(obj types.Object, s3Client *s3.Client, cfg RestoreConfig) error {
+func processObject(obj types.Object, s3Client *s3.Client, cfg *RestoreConfig) error {
 	if obj.Key == nil {
 		return nil
 	}
