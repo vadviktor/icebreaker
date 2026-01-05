@@ -50,7 +50,7 @@ func RestoreObjects(cfg *RestoreConfig) error {
 		}
 
 		for _, obj := range page.Contents {
-			if err := processObject(obj, s3Client, cfg); err != nil {
+			if err := restoreObject(obj, s3Client, cfg); err != nil {
 				return err
 			}
 		}
@@ -61,7 +61,7 @@ func RestoreObjects(cfg *RestoreConfig) error {
 	return nil
 }
 
-func processObject(obj types.Object, s3Client *s3.Client, cfg *RestoreConfig) error {
+func restoreObject(obj types.Object, s3Client *s3.Client, cfg *RestoreConfig) error {
 	if obj.Key == nil {
 		return nil
 	}
@@ -105,6 +105,8 @@ func processObject(obj types.Object, s3Client *s3.Client, cfg *RestoreConfig) er
 	} else if restoreStatus != nil && restoreStatus.IsRestoreInProgress != nil && *restoreStatus.IsRestoreInProgress {
 		cfg.Logger.Infof("🏗️ Restoring: %s", objectKey)
 	}
+
+	cfg.DB.AddKey(objectKey)
 
 	return nil
 }

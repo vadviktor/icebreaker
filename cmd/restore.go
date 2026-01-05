@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -24,6 +25,8 @@ var restoreCmd = &cobra.Command{
 	Short: "Initiates restoration of objects in S3 Glacier Deep Archive",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := helpers.ValidateFlags(cmd); err != nil {
+			logger.Error("Failed to validate flags: %v", err)
+			fmt.Println(err)
 			cmd.Help()
 			os.Exit(0)
 		}
