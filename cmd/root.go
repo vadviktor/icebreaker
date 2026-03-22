@@ -6,11 +6,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const longUsageBanner = `
+###########################################################
+#                                                         #
+#  (                                                      #
+#  )\ )               )                     )             #
+# (()/(        (   ( /(  (      (     )  ( /(    (   (    #
+#  /(_)) (    ))\  )\()) )(    ))\ ( /(  )\())  ))\  )(   #
+# (_))   )\  /((_)((_)\ (()\  /((_))(_))((_)\  /((_)(()\  #
+# |_ _| ((_)(_))  | |(_) ((_)(_)) ((_)_ | |(_)(_))   ((_) #
+#  | | / _| / -_) | '_ \| '_|/ -_)/ _' || / / / -_) | '_| #
+# |___|\__| \___| |_.__/|_|  \___|\__,_||_\_\ \___| |_|   #
+#                                                         #
+###########################################################
+
+Icebreaker scans a specified S3 path, finds objects stored in Deep Archive, and restores them if they aren't already being restored or aren't currently available.`
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "icebreaker",
 	Short: "Restore objects from S3 Glacier Deep Archive",
-	Long:  `Icebreaker scans a specified S3 path, finds objects stored in Deep Archive, and restores them if they aren't already being restored or aren't currently available.`,
+	Long:  longUsageBanner,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
